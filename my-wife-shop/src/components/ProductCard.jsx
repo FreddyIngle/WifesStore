@@ -1,23 +1,24 @@
 
 const ProductCard = ({ image, title, price, oldPrice, tag }) => {
     return(
-        <div className="bg-white rounded shadow-md">
-      <img src={image} alt={title} className="w-full h-60 object-cover" />
-      <div className="p-4">
-        <h3 className="text-md font-bold">{title}</h3>
-        <div className="mt-2">
-          {oldPrice && (
-            <span className="line-through text-gray-400 mr-2">${oldPrice}</span>
-          )}
-          <span className="text-red-500 font-semibold">${price}</span>
+        <div class="card bg-base-100 w-96 shadow-sm">
+            <figure>
+                <img
+                src={image}
+                alt={title} />
+            </figure>
+            <div class="card-body">
+                <h2 class="card-title">
+                {title}
+                <div class="badge badge-secondary">NEW</div>
+                </h2>
+                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
+                <div class="card-actions justify-end">
+                <div class="badge badge-outline">Fashion</div>
+                <div class="badge badge-outline">Products</div>
+                </div>
+            </div>
         </div>
-        {tag && (
-          <div className="mt-2 text-xs text-white bg-blue-500 inline-block px-2 py-1 rounded">
-            {tag}
-          </div>
-        )}
-      </div>
-    </div>
     )
 
 

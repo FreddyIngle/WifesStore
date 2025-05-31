@@ -1,17 +1,90 @@
 import { useState } from 'react'
+import ProductCard from './components/ProductCard';
 
 
 function App() {
   const [count, setCount] = useState(0)
+  const [searchTerm, setSearchTerm] = useState('');
+  
+
+  //dummy data
+  const dummyProducts = [
+  {
+    title: 'Super Mario',
+    image: 'https://i.etsystatic.com/35185215/r/il/ed8f68/6570779080/il_1588xN.6570779080_7ck2.jpg',
+    price: 68,
+  },
+  {
+    title: 'Dead Pool',
+    image: 'https://i.etsystatic.com/35185215/r/il/5b3f23/6570738782/il_1588xN.6570738782_rzjo.jpg',
+    price: 16.5,
+    oldPrice: 48,
+  },
+  {
+    title: 'Hello Kitty',
+    image: 'https://i.etsystatic.com/35185215/c/1679/1679/290/1077/il/31fbcf/6290684146/il_600x600.6290684146_2qq0.jpg',
+    price: 20,
+    oldPrice: 25,
+  },
+  {
+    title: 'Stitch',
+    image: 'https://i.etsystatic.com/35185215/r/il/e1dbb4/5379852857/il_1588xN.5379852857_no5r.jpg',
+    price: 38,
+    oldPrice: 48,
+  },
+    {
+    title: 'Unicorn',
+    image: 'https://i.etsystatic.com/35185215/c/2250/1784/0/827/il/c71d8f/5379979751/il_600x600.5379979751_t46h.jpg',
+    price: 38,
+    oldPrice: 48,
+  },
+    {
+    title: 'Personalizeable Apron',
+    image: 'https://i.etsystatic.com/35185215/r/il/088d51/5755881062/il_1588xN.5755881062_b6po.jpg',
+    price: 38,
+    oldPrice: 48,
+  },
+    {
+    title: 'Stainless tumbler',
+    image: 'https://i.etsystatic.com/35185215/r/il/408dcf/5682651676/il_1588xN.5682651676_ohjr.jpg',
+    price: 38,
+    oldPrice: 48,
+  },
+    {
+    title: 'Spiderman',
+    image: 'https://i.etsystatic.com/35185215/r/il/793e5f/6338858023/il_1588xN.6338858023_lwq6.jpg',
+    price: 38,
+    oldPrice: 48,
+  },
+];
+
+  const filteredProducts = dummyProducts.filter(product =>
+    product.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen bg-white">
                 {/*NAVBAR*/}
                 <div className="navbar bg-[#f9f9fb] text-gray-800">
               <div className="flex-1">
                 <a className="btn btn-ghost text-xl">Kyer's Handmades</a>
               </div>
+              <div className="form-control">
+                <div className="input input-bordered flex items-center gap-2 bg-white text-gray-800">
+                  <svg className="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                  </svg>
+                  <input type="text" placeholder="Search" className="grow bg-transparent outline-none placeholder-gray-400"
+                          value ={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+ 
+                          />
+                </div>
+            </div>
+
+              
+            
               <div className="flex-none">
                 <div className="dropdown dropdown-end">
                   <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
@@ -55,6 +128,20 @@ function App() {
                 </div>
               </div>
             </div>
+
+            {/*Product Cards*/}
+            <div>
+              {filteredProducts.map((product, idx) => (
+                <ProductCard key={idx}{...product}/>
+              ))}
+            </div>
+
+
+
+
+
+
+
     </div>
     
     
