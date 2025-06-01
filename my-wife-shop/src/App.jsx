@@ -1,14 +1,30 @@
-import { useState } from 'react'
+import { useEffect,useState } from 'react'
+import { supabase } from './supabaseClient'
 import ProductCard from './components/ProductCard';
-import Carousel from './components/Carousel';
+import { signInWithGoogle } from './components/auth';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
+import { faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
 
 
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [searchTerm, setSearchTerm] = useState('');
+    const [user, setUser] = useState(null)
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleProtectedClick = async () => {
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        signInWithGoogle();
+    } else {
+        // logic for when the user is authenticated
+        console.log('User is authenticated:', user);
+        await supabase.auth.signOut();
+    }
+    };
   
 
   //dummy data
@@ -107,27 +123,49 @@ function App() {
 
       {/* RIGHT CONTROLS */}
       <div className="flex-none flex gap-2 items-center">
-        <div className="btn btn-ghost btn-circle">
+
+        {/* Cart Icon */}
+        <button className="btn btn-ghost btn-circle" onClick={handleProtectedClick}>
           <div className="indicator">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span className="badge badge-sm indicator-item">8</span>
+            <span className="badge badge-sm indicator-item">0</span>
           </div>
+        </button>
+
+        {/* User Avatar */}
+<div className="dropdown dropdown-end">
+  <div tabIndex={0} role="button" className="avatar btn btn-ghost btn-circle">
+    <div className="w-10 rounded-full">
+      <img
+        alt="User avatar"
+        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+      />
+    </div>
+  </div>
+  <ul
+    tabIndex={0}
+    className="text-white dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+        >
+    <li onClick={handleProtectedClick}><a>Account</a></li>
+    <li onClick={handleProtectedClick}>
+  <a>{user ? 'Sign Out' : 'Sign In'}</a>
+</li>
+  </ul>
+</div>
+
+
         </div>
-        <div className="avatar btn btn-ghost btn-circle">
-          <div className="w-10 rounded-full">
-            <img alt="User avatar" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-          </div>
-        </div>
-      </div>
+
     </div>
 
     {/* SCROLLABLE PRODUCT GRID */}
     <div className="flex-1 overflow-y-auto px-6 pb-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
         {filteredProducts.map((product, idx) => (
-          <ProductCard key={idx} {...product} />
+          <ProductCard key={idx} {...product}
+           handleProtectedClick={handleProtectedClick}/>
         ))}
       </div>
     </div>
