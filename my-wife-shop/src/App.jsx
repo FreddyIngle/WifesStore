@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import ProductCard from './components/ProductCard';
 import Carousel from './components/Carousel';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFacebook, faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
+
 
 
 function App() {
@@ -130,10 +133,24 @@ function App() {
     </div>
 
     {/* FOOTER (optional placeholder for now) */}
-    <div className="shrink-0 border-t p-4 text-center text-sm text-gray-500">
-      © 2025 Kyer's Handmades. All rights reserved.
-      
+    <div className="shrink-0 border-t py-2 text-center text-sm text-gray-500">
+  <div className="flex flex-col items-center">
+    <p>© 2025 Kyer's Handmades. All rights reserved.</p>
+    <div className="flex gap-4 mt-1">
+      <a href="https://kyershandmades.etsy.com/" target="_blank" rel="noreferrer">
+        <FontAwesomeIcon
+          icon={faEtsy}
+          className="text-orange-500 text-lg hover:scale-110 transition-transform"
+        />
+      </a>
+
+      <a href="https://www.instagram.com/kyershandmades/" target="_blank" rel="noreferrer">
+        <FontAwesomeIcon icon={faInstagram} className="text-pink-500 text-lg hover:scale-110 transition-transform" />
+      </a>
     </div>
+  </div>
+</div>
+
   </div>
 );
 
