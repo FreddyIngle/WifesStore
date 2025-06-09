@@ -1,7 +1,10 @@
-import { useEffect,useState } from 'react'
+import { useEffect,useState,useMemo } from 'react'
+import { ToastContainer,toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient'
 import ProductCard from './components/ProductCard';
 import { signInWithGoogle } from './components/auth';
+import { useCart } from "./context/CartContext";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
@@ -11,89 +14,140 @@ import { faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
 function App() {
     const [user, setUser] = useState(null)
     const [searchTerm, setSearchTerm] = useState('');
+     const { cartItemCount } = useCart();//for cart item count
+    
+     
 
-    const handleProtectedClick = async () => {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+ useEffect(() => {
+  const fetchUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+  };
 
-    if (!user) {
-        signInWithGoogle();
-    } else {
-        // logic for when the user is authenticated
-        console.log('User is authenticated:', user);
-        await supabase.auth.signOut();
+  fetchUser();
+
+  const {
+    data: { subscription }
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user || null);
+  });
+
+  return () => subscription?.unsubscribe(); 
+}, []);
+
+// Functions to handle protected routes
+const signIn = async () => {
+    try {
+        if (!user) {
+            await signInWithGoogle();
+        }
+    }catch (error) {
+        console.error("Error signing in:", error.message || error);
     }
-    };
+};
+const signOut = async () => {
+    try {
+        await supabase.auth.signOut();
+        toast.success("Signed out successfully!");
+        setUser(null);
+        navigate('/');
+        
+
+
+        
+    }catch (error) {
+        console.error("Error signing out:", error.message || error);
+    }
+};
+
+
+
   
 
   //dummy data
   const dummyProducts = [
   {
+    id:1,
     title: 'Super Mario',
     image: 'https://i.etsystatic.com/35185215/r/il/ed8f68/6570779080/il_1588xN.6570779080_7ck2.jpg',
     price: 9.78,
     tag: 'Keychain',
     tag2: 'Nintendo',
+    inventory:5,
   },
   {
+    id:2,
     title: 'Dead Pool',
     image: 'https://i.etsystatic.com/35185215/r/il/5b3f23/6570738782/il_1588xN.6570738782_rzjo.jpg',
     price: 9.78,
     oldPrice: 48,
     tag: 'Keychain',
     tag2: 'Marvel',
+    inventory:10,
   },
   {
+    id:3,
     title: 'Hello Kitty',
     image: 'https://i.etsystatic.com/35185215/c/1679/1679/290/1077/il/31fbcf/6290684146/il_600x600.6290684146_2qq0.jpg',
     price: 9.78,
     oldPrice: 25,
     tag: 'Keychain',
     tag2: 'Misc',
+    inventory:20,
   },
   {
+    id:4,
     title: 'Stitch',
     image: 'https://i.etsystatic.com/35185215/r/il/e1dbb4/5379852857/il_1588xN.5379852857_no5r.jpg',
     price: 10.78,
     oldPrice: 48,
     tag: 'Keychain',
     tag2: 'Disney',
+    inventory:18,
   },
     {
+        id:5,
     title: 'Unicorn',
     image: 'https://i.etsystatic.com/35185215/c/2250/1784/0/827/il/c71d8f/5379979751/il_600x600.5379979751_t46h.jpg',
     price: 9.78,
     oldPrice: 48,
     tag: 'Keychain',
     tag2: 'misc',
+    inventory:10,
   },
     {
+        id:6,
     title: 'Personalizeable Apron',
     image: 'https://i.etsystatic.com/35185215/r/il/088d51/5755881062/il_1588xN.5755881062_b6po.jpg',
     price: 19.86,
     oldPrice: 48,
     tag: 'Fashion',
     tag2: 'Apron',
+    inventory:18,
   },
     {
+        id:7,
     title: 'Stainless tumbler',
     image: 'https://i.etsystatic.com/35185215/r/il/408dcf/5682651676/il_1588xN.5682651676_ohjr.jpg',
     price: 33.75,
     oldPrice: 48,
     tag: 'Tumbler',
     tag2: 'Stainless',
+   inventory:50,
   },
     {
+        id:8,
     title: 'Spiderman',
     image: 'https://i.etsystatic.com/35185215/r/il/793e5f/6338858023/il_1588xN.6338858023_lwq6.jpg',
     price: 9.78,
     oldPrice: 48,
     tag: 'Keychain',
     tag2: 'Marvel',
+    inventory:25,
 
   },
 ];
+    const [products, setProducts] = useState(dummyProducts);
 
   const filteredProducts = dummyProducts.filter(product =>
     product.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -125,12 +179,12 @@ function App() {
       <div className="flex-none flex gap-2 items-center">
 
         {/* Cart Icon */}
-        <button className="btn btn-ghost btn-circle" onClick={handleProtectedClick}>
+        <button className="btn btn-ghost btn-circle" onClick={signIn}>
           <div className="indicator">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span className="badge badge-sm indicator-item">0</span>
+            <span className="badge badge-sm indicator-item">{cartItemCount}</span>
           </div>
         </button>
 
@@ -139,17 +193,19 @@ function App() {
   <div tabIndex={0} role="button" className="avatar btn btn-ghost btn-circle">
     <div className="w-10 rounded-full">
       <img
-        alt="User avatar"
-        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-      />
+  alt="User avatar"
+  src={
+    "https://www.gravatar.com/avatar/?d=mp" // Fallback placeholder
+  }
+/>
     </div>
   </div>
   <ul
     tabIndex={0}
     className="text-white dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
         >
-    <li onClick={handleProtectedClick}><a>Account</a></li>
-    <li onClick={handleProtectedClick}>
+    <li onClick={signIn}><a>Account</a></li>
+    <li onClick={user ? signOut : signIn}>
   <a>{user ? 'Sign Out' : 'Sign In'}</a>
 </li>
   </ul>
@@ -165,7 +221,7 @@ function App() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
         {filteredProducts.map((product, idx) => (
           <ProductCard key={idx} {...product}
-           handleProtectedClick={handleProtectedClick}/>
+           signIn={signIn}/>
         ))}
       </div>
     </div>
@@ -188,8 +244,10 @@ function App() {
     </div>
   </div>
 </div>
+<ToastContainer autoClose={2000}/>
 
   </div>
+ 
 );
 
 }
