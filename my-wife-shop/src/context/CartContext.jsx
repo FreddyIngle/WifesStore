@@ -14,33 +14,66 @@ export const CartContext = createContext();
     return context;
     };
 
+
     export function CartProvider({ children }) {
         const [cart, setCart] = useState([]);
+        const [cartLoaded, setCartLoaded] = useState(false); // ← new state
 
-        useEffect(() => {
-        const fetchCart = async () => {
-            const { data: {user}, error} = await supabase.auth.getUser();
-            if (error || !user) {
-                console.error("Error fetching user:", error);
-                return;
-            }
-            const { data, error: fetchError } = await supabase
-                .from("cart")
-                .select("*")
-                .eq("user_id", user.id);
-            if (fetchError) {
-                console.error("Error fetching cart items:", fetchError);
-                return;
-            }else{
-                setCart(data);
-            }
-        }
-        fetchCart();
-    }, []);
 
-    async function addToCart(product_id, title, quantity, custom_name, color_choice){
+       useEffect(() => {
+  const fetchCart = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("cart")
+        .select("*")
+        .eq("user_id", userId);
 
-      setCart((prev) => [...prev, { product_id, title, quantity, custom_name, color_choice }]);
+      if (error) throw error;
+
+      setCart(data ?? []);
+    } catch (err) {
+      console.error("Cart fetch error:", err.message);
+      setCart([]); // fallback
+    } finally {
+      setCartLoaded(true); // ✅ ensures loading state always finishes
+    }
+  };
+
+  const loadCartIfLoggedIn = async (sess) => {
+    if (sess?.user) await fetchCart(sess.user.id);
+    else {
+      setCart([]);
+      setCartLoaded(true); // ✅ important
+    }
+  };
+
+  // 1️⃣ Try current session
+  supabase.auth.getSession().then(({ data, error }) => {
+    if (error) console.error("Session error:", error);
+    loadCartIfLoggedIn(data?.session ?? null);
+  });
+
+  // 2️⃣ Listen for auth state changes
+  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    loadCartIfLoggedIn(session);
+  });
+
+  return () => listener.subscription.unsubscribe();
+}, []);
+
+
+
+    async function addToCart(product_id, title, quantity, custom_name, color_choice, price){
+
+        const newItem = {
+            product_id,
+            quantity,
+            custom_name,
+            color_choice,
+            title,
+            price
+        };
+      setCart((prev) => [...prev, newItem]); // Update cart state immediately
 
       // Save to Supabase, wrap in try-catch for error handling
       const{
@@ -65,6 +98,7 @@ export const CartContext = createContext();
                 quantity:Number(quantity),
                 custom_name,
                 color_choice,
+                price:Number(price),
                 
                 },
             ]);
@@ -86,7 +120,7 @@ export const CartContext = createContext();
         return cart.reduce((sum, item) => sum + item.quantity, 0);
         }, [cart]);
 
-    const value = {cart, addToCart, calculateCartTotal, cartItemCount, setCart};
+    const value = {cart, addToCart, calculateCartTotal, cartItemCount, setCart, cartLoaded};
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 
 

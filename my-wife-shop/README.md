@@ -13,7 +13,7 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## Todo
 - [x] **Add to cart**
-- [] **update cart icon to show cart amount**
+- [x] **update cart icon to show cart amount**
 - [] **Show mini cart view when icon clicked**
 - [] **make checkout page**
 - [] **Checkout logic**
