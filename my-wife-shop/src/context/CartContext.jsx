@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, useEffect, use } from "react";
+import { createContext, useContext, useState, useMemo, useEffect,useCallback } from "react";
 import { supabase } from "../supabaseClient";
 import { signInWithGoogle } from "../components/auth";
 
@@ -46,6 +46,7 @@ export const CartContext = createContext();
       setCartLoaded(true); // ✅ important
     }
   };
+  
 
   // 1️⃣ Try current session
   supabase.auth.getSession().then(({ data, error }) => {
@@ -63,57 +64,101 @@ export const CartContext = createContext();
 
 
 
-    async function addToCart(product_id, title, quantity, custom_name, color_choice, price){
+    async function refetchCart(userId) {
+  const { data, error } = await supabase
+    .from('cart')
+    .select('*')
+    .eq('user_id', userId);
 
-        const newItem = {
-            product_id,
-            quantity,
-            custom_name,
-            color_choice,
-            title,
-            price
-        };
-      setCart((prev) => [...prev, newItem]); // Update cart state immediately
+  if (!error) {
+    // make sure id is a number so delete comparisons always match
+    setCart(data.map((r) => ({ ...r, id: Number(r.id) })));
+  } else {
+    console.error('Refetch error:', error.message);
+  }
+}
 
-      // Save to Supabase, wrap in try-catch for error handling
-      const{
-        data: { user },
-        error,} = await supabase.auth.getUser();
-      if (error || !user) {
-        console.error("Error fetching user or user not authenticated:", error);
-        signInWithGoogle();
-        return;
-        
-      }
+/* ------------- main add-to-cart ------------- */
+async function addToCart(
+  product_id,
+  title,
+  quantity,
+  custom_name,
+  color_choice,
+  price
+) {
+  /* 1️⃣ optimistic placeholder (optional but nice) */
+  setCart((prev) => [
+    ...prev,
+    {
+      temp: crypto.randomUUID(), // marker in case you do swap-in later
+      product_id,
+      quantity,
+      custom_name,
+      color_choice,
+      title,
+      price,
+    },
+  ]);
 
+  /* 2️⃣ make sure we have a user */
+  const {
+    data: { user },
+    error: userErr,
+  } = await supabase.auth.getUser();
 
-      const {data, table_error} = await supabase
-         .from("cart")
-         .insert([
-                {
-                
-                user_id:user.id, //uuid
-                title, //text
-                product_id: Number(product_id), //integer
-                quantity:Number(quantity),
-                custom_name,
-                color_choice,
-                price:Number(price),
-                
-                },
-            ]);
-            if(table_error) {
-                console.error("Supabase insert error:", table_error);
-            }
-    }//end addToCart
+  if (userErr || !user) {
+    console.error('Auth error:', userErr);
+    signInWithGoogle();
+    return;
+  }
 
-    const calculateCartTotal = useMemo(() => {
+  /* 3️⃣ insert row */
+  const { error: insertErr } = await supabase
+    .from('cart')
+    .insert([
+      {
+        user_id: user.id,
+        title,
+        product_id: Number(product_id),
+        quantity: Number(quantity),
+        custom_name,
+        color_choice,
+        price: parseFloat(price), // safer than Number()
+      },
+    ]);
+
+  if (insertErr) {
+    console.error('Supabase insert error:', insertErr.message);
+    // rollback optimistic UI if you want:
+    // setCart(prev => prev.filter(i => i.temp !== tempKey));
+    return;
+  }
+
+  /* 4️⃣ refetch so every row now carries the real id */
+  await refetchCart(user.id);
+
+  /* --- If you’d rather avoid the full refetch ---
+     const { data: row } = await supabase
+       .from('cart')
+       .insert([{ …payload }])
+       .select()
+       .single();
+
+     setCart(prev =>
+       prev.map(i => (i.temp === tempKey ? { ...row, id: Number(row.id) } : i))
+     );
+  */
+}
+
+    const calculateCartTotal = useCallback(() => {
         let total = 0;
         cart.forEach((item) => {
-            total += item.quantity * item.price; // Assuming each item has a price property
+            total += item.quantity * item.price;
         });
-        return total.toFixed(2); // Return total as a string with 2 decimal places
-    }, [cart]);//end calculateCartTotal
+        return total.toFixed(2);
+        }, [cart]);
+
 
     //count for cart badge icon
     const cartItemCount = useMemo(() => {

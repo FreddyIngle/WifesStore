@@ -11,8 +11,9 @@ const ProductCard = ({ product_id,image, title, price, oldPrice, tag, tag2, inve
   const [customizations, setCustomizations] = useState([]);
   const [allSame, setAllSame] = useState(false); //to keep all custom input same for each quantity
   const [allSameColor, setAllSameColor] = useState(false); //to keep all custom color same for each quantity
-    const { addToCart } = useCart();
-  const handleQuantityChange = (e) => {
+const { addToCart } = useCart();
+  
+    const handleQuantityChange = (e) => {
     const value = e.target.value;
     if (value === '' || /^\d+$/.test(value)) {
       setQuantity(value);
@@ -168,7 +169,8 @@ const ProductCard = ({ product_id,image, title, price, oldPrice, tag, tag2, inve
                     title, 
                     1,         // qty == 1 because this loop already runs 'quantity' times
                     custom.name,
-                    custom.color
+                    custom.color,
+                    price
                 );
                 });
 

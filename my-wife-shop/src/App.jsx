@@ -5,7 +5,7 @@ import { supabase } from './supabaseClient'
 import ProductCard from './components/ProductCard';
 import { signInWithGoogle } from './components/auth';
 import { useCart } from "./context/CartContext";
-
+import MiniCart from './components/MiniCart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
 
@@ -15,6 +15,8 @@ function App() {
     const [user, setUser] = useState(null)
     const [searchTerm, setSearchTerm] = useState('');
      const { cartItemCount, cartLoaded } = useCart();//for cart item count
+     
+     //mini cart state
      const [showMiniCart, setShowMiniCart] = useState(false);
      const toggleCart = () => { setShowMiniCart((prev) => !prev) };
     
@@ -181,20 +183,41 @@ const signOut = async () => {
       {/* RIGHT CONTROLS */}
       <div className="flex-none flex gap-2 items-center">
 
-        {/* Cart Icon */}
-        <button className="btn btn-ghost btn-circle" onClick={signIn}>
-          <div className="indicator">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {cartLoaded ? (
-            <span className="badge badge-sm indicator-item">{cartItemCount}</span>
-            ) : (
-                <span className="cart-count-badge">...</span> // or use a spinner, skeleton, etc
-            )
-        }
-          </div>
-        </button>
+        {/* Cart Icon Button */}
+  <button
+    className="btn btn-ghost btn-circle"
+    onClick={() => {
+      signIn();
+      toggleCart();
+    }}
+  >
+    <div className="indicator">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+        />
+      </svg>
+      {cartLoaded ? (
+        <span className="badge badge-sm indicator-item">
+          {cartItemCount}
+        </span>
+      ) : (
+        <span className="cart-count-badge">...</span>
+      )}
+    </div>
+  </button>
+
+  {/* Mini Cart rendered OUTSIDE the button */}
+  {showMiniCart && <MiniCart onClose={() => setShowMiniCart(false)} />}
 
         {/* User Avatar */}
 <div className="dropdown dropdown-end">
