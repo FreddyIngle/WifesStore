@@ -71,7 +71,7 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
                     ) : (
                       <ul role="list" className="-my-6 divide-y divide-gray-200">
                         {cart.map((item) => (
-                          <li key={item.id} className="flex py-6">
+                          <li key={item.id} className="flex py-6 ">
                             {/* placeholder thumbnail – swap in product image if you store it */}
                             <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-100" />
 
@@ -92,11 +92,15 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
                                 <p className="text-gray-500">Qty {item.quantity}</p>
 
                                 <button
+                                  
                                   type="button"
                                   onClick={() => handleRemoveItem(item.id)}
-                                  className="flex items-center gap-1 font-medium text-indigo-600 hover:text-indigo-500"
+                                  className="flex items-center gap-1 font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer 
+                                  transition transform duration-150 ease-out
+             hover:scale-105 hover:text-red-600 focus-visible:outline-none"
                                 >
-                                  <TrashIcon className="size-4" />
+                                  <TrashIcon className="size-4" cursor="pointer"
+                                   />
                                   Remove
                                 </button>
                               </div>
