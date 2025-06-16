@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { XMarkIcon,TrashIcon } from '@heroicons/react/24/outline'
 
-export default function MiniCart({ triggerClass = 'btn btn-ghost btn-circle' }){
+export default function MiniCart({ open, onClose }){
 
     const { cart, calculateCartTotal, setCart } = useCart();
-    const [open, setOpen] = useState(true)
+    
     // helper to format USD prices (change locale / currency if you need)
 const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
@@ -27,13 +27,11 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
             };
     return (
 <div>
-      {/* ───── CART ICON / TRIGGER ───── */}
-      <button onClick={() => setOpen(true)} className={triggerClass}>
-        {/* put your 🛒 svg here */}
-      </button>
+     
 
       {/* ───── DRAWER ───── */}
-      <Dialog open={open} onClose={setOpen} className="relative z-50">
+      {open && (
+      <Dialog open={open} onClose={() =>setOpen(false)} className="relative z-50">
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0"
@@ -54,8 +52,8 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
                       Shopping cart
                     </DialogTitle>
                     <button
-                      onClick={() => setOpen(false)}
-                      className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
+                      onClick={onClose}
+                      className="relative -m-2 p-2 text-gray-400 hover:text-gray-500 cursor-pointer transition transform duration-150 ease-out hover:scale-105 focus-visible:outline-none"
                     >
                       <span className="sr-only">Close panel</span>
                       <XMarkIcon className="size-6" />
@@ -73,7 +71,14 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
                         {cart.map((item) => (
                           <li key={item.id} className="flex py-6 ">
                             {/* placeholder thumbnail – swap in product image if you store it */}
-                            <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-100" />
+                            <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-100">
+                                <img
+                                    src={item.image_url}
+                                    alt={item.title}
+                                    loading="lazy"
+                                    className="size-full object-cover"
+                                />
+                            </div>
 
                             <div className="ml-4 flex flex-1 flex-col">
                               <div>
@@ -130,11 +135,11 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
                       </button>
                     </div>
 
-                    <div className="mt-6 flex justify-center text-sm text-gray-500">
+                    <div className="mt-6 flex justify-center text-sm text-gray-500 ">
                       <button
                         type="button"
-                        onClick={() => setOpen(false)}
-                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                        onClick={onClose}
+                        className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer transition transform duration-150 ease-out hover:scale-105"
                       >
                         Continue Shopping →
                       </button>
@@ -146,6 +151,7 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
           </div>
         </div>
       </Dialog>
+      )}
     </div>
     );
 

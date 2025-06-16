@@ -170,7 +170,8 @@ const { addToCart } = useCart();
                     1,         // qty == 1 because this loop already runs 'quantity' times
                     custom.name,
                     custom.color,
-                    price
+                    price,
+                    image,
                 );
                 });
 

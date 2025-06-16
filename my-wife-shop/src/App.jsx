@@ -18,8 +18,10 @@ function App() {
      
      //mini cart state
      const [showMiniCart, setShowMiniCart] = useState(false);
-     const toggleCart = () => { setShowMiniCart((prev) => !prev) };
-    
+     
+    // source of truth for the drawer
+    const [cartOpen, setCartOpen] = useState(false);
+
      
 
  useEffect(() => {
@@ -188,7 +190,7 @@ const signOut = async () => {
     className="btn btn-ghost btn-circle"
     onClick={() => {
       signIn();
-      toggleCart();
+        setCartOpen(true);
     }}
   >
     <div className="indicator">
@@ -217,7 +219,7 @@ const signOut = async () => {
   </button>
 
   {/* Mini Cart rendered OUTSIDE the button */}
-  {showMiniCart && <MiniCart onClose={() => setShowMiniCart(false)} />}
+  <MiniCart open={cartOpen} onClose={() => setCartOpen(false)} />
 
         {/* User Avatar */}
 <div className="dropdown dropdown-end">

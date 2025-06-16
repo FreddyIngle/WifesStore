@@ -85,7 +85,8 @@ async function addToCart(
   quantity,
   custom_name,
   color_choice,
-  price
+  price,
+  image_url
 ) {
   /* 1️⃣ optimistic placeholder (optional but nice) */
   setCart((prev) => [
@@ -98,6 +99,7 @@ async function addToCart(
       color_choice,
       title,
       price,
+      image_url,
     },
   ]);
 
@@ -125,6 +127,7 @@ async function addToCart(
         custom_name,
         color_choice,
         price: parseFloat(price), // safer than Number()
+        image_url
       },
     ]);
 
