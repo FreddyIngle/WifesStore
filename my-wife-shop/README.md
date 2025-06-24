@@ -14,7 +14,7 @@ If you are developing a production application, we recommend using TypeScript wi
 ## Todo
 - [x] **Add to cart**
 - [x] **update cart icon to show cart amount**
-- [] **Show mini cart view when icon clicked**
+- [x] **Show mini cart view when icon clicked**
 - [] **make checkout page**
 - [] **Checkout logic**
 - [] **Rewrite products to push to supabase table**
@@ -26,3 +26,8 @@ If you are developing a production application, we recommend using TypeScript wi
 - [] **"NEW" badge from items added less than 48 hours ago**
 - [] **Deploy**
 - [] **Test/Optimize for SEO**
+
+## Advanced
+-[] **Make shipping label function for items bought* from API**
+-[] **Make Sellers sale history chart**
+

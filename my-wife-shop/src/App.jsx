@@ -8,6 +8,11 @@ import { useCart } from "./context/CartContext";
 import MiniCart from './components/MiniCart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
+import SellerDashboard from './components/UploadProduct';
+import { useIsSeller } from './hooks/useIsSeller';
+import ShopManagerNav from './components/ShopManagerNav';
+
+import { Link, useNavigate, Route,Routes } from 'react-router-dom';
 
 
 
@@ -15,7 +20,8 @@ function App() {
     const [user, setUser] = useState(null)
     const [searchTerm, setSearchTerm] = useState('');
      const { cartItemCount, cartLoaded } = useCart();//for cart item count
-     
+     const isSeller = useIsSeller(); // Custom hook to check if user is a seller
+     const [sellerOpen, setSellerOpen] = useState(false);
      //mini cart state
      const [showMiniCart, setShowMiniCart] = useState(false);
      
@@ -36,6 +42,7 @@ function App() {
     data: { subscription }
   } = supabase.auth.onAuthStateChange((_event, session) => {
     setUser(session?.user || null);
+    
   });
 
   return () => subscription?.unsubscribe(); 
@@ -161,8 +168,21 @@ const signOut = async () => {
   );
 
   return (
-  <div className="flex flex-col h-screen bg-white">
-    {/* NAVBAR */}
+
+  <div className="flex flex-col h-screen bg-white relative">
+   
+     {/* SHOP MANAGER NAV (absolute overlay) */}
+    {isSeller && (
+      <div className="absolute top-0 left-0 z-30 flex-1 h-screen">
+        <ShopManagerNav isSeller={isSeller} onLogout={signOut} />
+      </div>
+    )}
+     {/* NAVBAR */}
+     <div
+        /* push right by 4 rem when collapsed, 16 rem when open */
+        className={`flex flex-col flex-1 bg-white `}
+                   
+      >
     <div className="navbar bg-[#f9f9fb] text-gray-800 shrink-0">
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">Kyer's Handmades</a>
@@ -218,6 +238,8 @@ const signOut = async () => {
     </div>
   </button>
 
+
+
   {/* Mini Cart rendered OUTSIDE the button */}
   <MiniCart open={cartOpen} onClose={() => setCartOpen(false)} />
 
@@ -259,6 +281,12 @@ const signOut = async () => {
       </div>
     </div>
 
+    {/* seller drawer mounts here */}
+      <SellerDashboard open={sellerOpen} onClose={() => setSellerOpen(false)} />
+
+ 
+
+    
     {/* FOOTER (optional placeholder for now) */}
     <div className="shrink-0 border-t py-2 text-center text-sm text-gray-500">
   <div className="flex flex-col items-center">
@@ -279,7 +307,11 @@ const signOut = async () => {
 </div>
 <ToastContainer autoClose={2000}/>
 
+ 
+
   </div>
+  </div>
+  
  
 );
 
