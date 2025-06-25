@@ -7,88 +7,8 @@ import { CartProvider } from '../context/CartContext';
 import { useEffect, useState } from 'react';
 import { uploadImageToBucket} from '../utils/uploadImage'; 
  //dummy data
-  const dummyProducts = [
-  {
-    id:1,
-    title: 'Super Mario',
-    image: 'https://i.etsystatic.com/35185215/r/il/ed8f68/6570779080/il_1588xN.6570779080_7ck2.jpg',
-    price: 9.78,
-    tag: 'Keychain',
-    tag2: 'Nintendo',
-    inventory:5,
-  },
-  {
-    id:2,
-    title: 'Dead Pool',
-    image: 'https://i.etsystatic.com/35185215/r/il/5b3f23/6570738782/il_1588xN.6570738782_rzjo.jpg',
-    price: 9.78,
-    oldPrice: 48,
-    tag: 'Keychain',
-    tag2: 'Marvel',
-    inventory:10,
-  },
-  {
-    id:3,
-    title: 'Hello Kitty',
-    image: 'https://i.etsystatic.com/35185215/c/1679/1679/290/1077/il/31fbcf/6290684146/il_600x600.6290684146_2qq0.jpg',
-    price: 9.78,
-    oldPrice: 25,
-    tag: 'Keychain',
-    tag2: 'Misc',
-    inventory:20,
-  },
-  {
-    id:4,
-    title: 'Stitch',
-    image: 'https://i.etsystatic.com/35185215/r/il/e1dbb4/5379852857/il_1588xN.5379852857_no5r.jpg',
-    price: 10.78,
-    oldPrice: 48,
-    tag: 'Keychain',
-    tag2: 'Disney',
-    inventory:18,
-  },
-    {
-        id:5,
-    title: 'Unicorn',
-    image: 'https://i.etsystatic.com/35185215/c/2250/1784/0/827/il/c71d8f/5379979751/il_600x600.5379979751_t46h.jpg',
-    price: 9.78,
-    oldPrice: 48,
-    tag: 'Keychain',
-    tag2: 'misc',
-    inventory:10,
-  },
-    {
-        id:6,
-    title: 'Personalizeable Apron',
-    image: 'https://i.etsystatic.com/35185215/r/il/088d51/5755881062/il_1588xN.5755881062_b6po.jpg',
-    price: 19.86,
-    oldPrice: 48,
-    tag: 'Fashion',
-    tag2: 'Apron',
-    inventory:18,
-  },
-    {
-        id:7,
-    title: 'Stainless tumbler',
-    image: 'https://i.etsystatic.com/35185215/r/il/408dcf/5682651676/il_1588xN.5682651676_ohjr.jpg',
-    price: 33.75,
-    oldPrice: 48,
-    tag: 'Tumbler',
-    tag2: 'Stainless',
-   inventory:50,
-  },
-    {
-        id:8,
-    title: 'Spiderman',
-    image: 'https://i.etsystatic.com/35185215/r/il/793e5f/6338858023/il_1588xN.6338858023_lwq6.jpg',
-    price: 9.78,
-    oldPrice: 48,
-    tag: 'Keychain',
-    tag2: 'Marvel',
-    inventory:25,
+  
 
-  }
-]
 const UploadProduct = ({open, onClose}) => {
 
     const [form, setForm] = useState({

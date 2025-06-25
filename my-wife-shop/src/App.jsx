@@ -8,11 +8,12 @@ import { useCart } from "./context/CartContext";
 import MiniCart from './components/MiniCart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faEtsy } from '@fortawesome/free-brands-svg-icons';
-import SellerDashboard from './components/UploadProduct';
+import UploadProduct from './components/UploadProduct';
 import { useIsSeller } from './hooks/useIsSeller';
 import ShopManagerNav from './components/ShopManagerNav';
 
 import { Link, useNavigate, Route,Routes } from 'react-router-dom';
+import Developer from './components/Developer';
 
 
 
@@ -24,7 +25,8 @@ function App() {
      const [sellerOpen, setSellerOpen] = useState(false);
      //mini cart state
      const [showMiniCart, setShowMiniCart] = useState(false);
-     
+     const [showUploadModal, setShowUploadModal] = useState(false);
+    const [showDevModal, setShowDevModal] = useState(false);
     // source of truth for the drawer
     const [cartOpen, setCartOpen] = useState(false);
 
@@ -174,7 +176,10 @@ const signOut = async () => {
      {/* SHOP MANAGER NAV (absolute overlay) */}
     {isSeller && (
       <div className="absolute top-0 left-0 z-30 flex-1 h-screen">
-        <ShopManagerNav isSeller={isSeller} onLogout={signOut} />
+        <ShopManagerNav isSeller={isSeller} 
+                        onLogout={signOut}
+                        onUploadClick={() => setShowUploadModal(true)} 
+                        onDevClick={() => setShowDevModal(true)}/>
       </div>
     )}
      {/* NAVBAR */}
@@ -281,8 +286,13 @@ const signOut = async () => {
       </div>
     </div>
 
-    {/* seller drawer mounts here */}
-      <SellerDashboard open={sellerOpen} onClose={() => setSellerOpen(false)} />
+    {/* Upload Product Modal*/}
+    <UploadProduct open={showUploadModal} onClose={() => setShowUploadModal(false)} />
+    {/* Developer Modal*/}
+    <Developer open={showDevModal} onClose={() => setShowDevModal(false)}/>
+    
+
+
 
  
 
