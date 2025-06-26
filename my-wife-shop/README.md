@@ -17,7 +17,7 @@ If you are developing a production application, we recommend using TypeScript wi
 - [x] **Show mini cart view when icon clicked**
 - [] **make checkout page**
 - [] **Checkout logic**
-- [] **Rewrite products to push to supabase table**
+- [x] **Rewrite products to push to supabase table**
 - [] **Etsy API**
 - [] **Leave Review**
 - [] **User Account page**

@@ -152,7 +152,7 @@ async function insertDummyProducts() {
     const insert = dummyProducts.map(product => ({
       ...product,
     
-      id: product.id,
+   
       title: product.title,
       image_url: product.image_url,
       price: parseFloat(product.price),
@@ -182,6 +182,21 @@ async function insertDummyProducts() {
 
 
 }
+async function clearAllProducts() {
+  const { error } = await supabase
+    .from('products')
+    .delete()
+    .neq('id', 0); // Deletes all rows where id != 0 (i.e., all rows)
+
+  if (error) {
+    console.error('Error clearing products:', error);
+    toast.error("Error clearing products.");
+  } else {
+    console.log('Products table cleared successfully.');
+    toast.success("Products cleared!");
+  }
+}
+
 
   return (
     <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm flex justify-center items-center">
@@ -267,6 +282,21 @@ async function insertDummyProducts() {
             ${devModeLocked ? 'opacity-50 cursor-not-allowed cur' : 'cursor-pointer '}`}>
     
     Push Script
+    
+    </button>
+
+    <button  
+    onClick={clearAllProducts}
+    disabled={devModeLocked}
+    type=" button" 
+    class={`focus:outline-none text-white bg-red-700 hover:bg-red-800 
+        focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 
+        dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 
+        transition transform duration-150 ease-out hover:scale-105
+        ${devModeLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+>
+    
+    Delete All
     
     </button>
 

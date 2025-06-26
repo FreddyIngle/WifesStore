@@ -5,7 +5,8 @@ import {  useCart } from '../context/CartContext';
 
 
 
-const ProductCard = ({ product_id,image, title, price, oldPrice, tag, tag2, inventory, signIn }) => {
+const ProductCard = ({ id,image_url, title, price, tag1, tag2, inventory, has_engraving,
+    has_font,has_color,signIn }) => {
   const [quantity, setQuantity] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [customizations, setCustomizations] = useState([]);
@@ -39,7 +40,7 @@ const { addToCart } = useCart();
     <>
       <div className="card w-full max-w-[400px] aspect-[3/4] bg-white shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden">
         <figure className="h-[90%] w-full">
-          <img src={image} alt={title} />
+          <img src={image_url} alt={title} />
         </figure>
         <div className="card-body p-4 text-sm flex flex-col justify-between">
           <h2 className="card-title text-black font-semibold text-sm mb-1">
@@ -78,7 +79,7 @@ const { addToCart } = useCart();
           </div>
 
           <div className="card-actions justify-end text-xs text-gray-500 border-gray-300">
-            <div className="badge badge-outline">{tag}</div>
+            <div className="badge badge-outline">{tag1}</div>
             <div className="badge badge-outline">{tag2}</div>
           </div>
         </div>
@@ -165,13 +166,17 @@ const { addToCart } = useCart();
                 // 1️⃣  push every single item
                 customizations.forEach((custom) => {
                 addToCart(
-                    product_id,   
+                    id,   
                     title, 
                     1,         // qty == 1 because this loop already runs 'quantity' times
                     custom.name,
                     custom.color,
                     price,
-                    image,
+                    image_url,
+                    has_engraving,
+                    has_font,
+                    has_color,
+                  
                 );
                 });
 
