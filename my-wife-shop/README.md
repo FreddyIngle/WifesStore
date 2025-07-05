@@ -1,5 +1,11 @@
 # React + Vite
 
+
+To run Netlify Server , run 
+
+'Netlify dev' in terminal 
+
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
@@ -15,8 +21,8 @@ If you are developing a production application, we recommend using TypeScript wi
 - [x] **Add to cart**
 - [x] **update cart icon to show cart amount**
 - [x] **Show mini cart view when icon clicked**
-- [] **make checkout page**
-- [] **Checkout logic**
+- [x] **make checkout page**
+- [x] **Checkout logic**
 - [x] **Rewrite products to push to supabase table**
 - [] **Etsy API**
 - [] **Leave Review**
@@ -29,5 +35,5 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## Advanced
 -[] **Make shipping label function for items bought* from API**
--[] **Make Sellers sale history chart**
+
 

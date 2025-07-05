@@ -7,6 +7,37 @@ import { XMarkIcon,TrashIcon } from '@heroicons/react/24/outline'
 export default function MiniCart({ open, onClose }){
 
     const { cart, calculateCartTotal, setCart } = useCart();
+
+    // handle checkout
+    const handleCheckout = async () => {
+  const lineItems = cart.map((item) => ({
+    price_data: {
+      currency: 'usd',
+      product_data: {
+        name: item.title,
+      },
+      unit_amount: Math.round(item.price * 100), // price in cents
+    },
+    quantity: item.quantity || 1,
+  }))
+  console.log('cart', cart)
+  ;
+
+  const response = await fetch('/.netlify/functions/create-checkout-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cartItems: cart }),
+  });
+
+  const data = await response.json();
+
+  if (data.url) {
+    window.location.href = data.url; // Redirect to Stripe Checkout
+  } else {
+    alert('Something went wrong');
+  }
+};
+
     
     // helper to format USD prices (change locale / currency if you need)
 const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
@@ -129,6 +160,9 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
                     <div className="mt-6">
                       <button
                         disabled={cart.length === 0}
+                        onClick={handleCheckout}
+                       
+
                         className="flex w-full items-center justify-center rounded-md bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700 disabled:opacity-40 disabled:hover:bg-indigo-600"
                       >
                         Checkout
