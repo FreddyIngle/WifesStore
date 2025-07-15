@@ -3,10 +3,17 @@ import { supabase } from '../supabaseClient';
 import { useState } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import { XMarkIcon,TrashIcon } from '@heroicons/react/24/outline'
-
+import { useNavigate } from 'react-router-dom';
 export default function MiniCart({ open, onClose }){
 
     const { cart, calculateCartTotal, setCart } = useCart();
+
+     const navigate = useNavigate();
+    const handleRedirectToCheckout = () => {
+      navigate('/CheckoutPage',{
+        state: { cart }
+      });
+    };
 
     // handle checkout
     const handleCheckout = async () => {
@@ -160,7 +167,7 @@ const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' 
                     <div className="mt-6">
                       <button
                         disabled={cart.length === 0}
-                        onClick={handleCheckout}
+                        onClick={handleRedirectToCheckout}
                        
 
                         className="flex w-full items-center justify-center rounded-md bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700 disabled:opacity-40 disabled:hover:bg-indigo-600"

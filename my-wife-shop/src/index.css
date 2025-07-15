@@ -7,4 +7,8 @@
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
+input {
+  background: white;
+  outline: none;
+}
 
