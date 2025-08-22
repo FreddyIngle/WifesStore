@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getData } from "country-list";
 import { useCart } from "../context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
+import { supabase } from "../supabaseClient";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function CheckoutPage() {
@@ -73,15 +74,86 @@ export default function CheckoutPage() {
     return /^\d{5}$/.test(zip);
   }
 
-  // --- Parcel (replace with your Supabase-driven version later) ---
-  const parcel = {
-    length: 6,
-    width: 4,
-    height: 2,
-    distance_unit: "in",
-    weight: 12,
-    mass_unit: "oz",
-  };
+  // --- Parcel(Static, for testng purposes) ---
+  //const parcel = {
+    //length: 6,
+    //width: 4,
+    //height: 2,
+    //distance_unit: "in",
+    //weight: 12,
+    //mass_unit: "oz",
+  //};
+  // ---- Supabase-backed parcel builder ----
+  // Cache product rows so we don’t re-fetch on every click
+  const [productsCache, setProductsCache] = useState({});
+  async function hydrateProductsForCart() {
+     const ids = [...new Set(
+    (cart || [])
+      .map(i => Number(i.product_id))
+      .filter(id => Number.isFinite(id))
+  )];
+    const missingIds = ids.filter((id) => !productsCache[id]);
+    if (missingIds.length === 0) return productsCache; // all cached
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, length, width, height, weight_oz")
+      .in("id", missingIds);
+
+      if (error) {
+        throw new Error(`Supabase: ${error.message}`)
+      }
+      const next = { ...productsCache };
+      (data || []).forEach((p) => {
+        next[Number(p.id)] = {
+          length: Number(p.length ?? 0),
+          width: Number(p.width ?? 0),
+          height: Number(p.height ?? 0),
+          weight_oz: Number(p.weight_oz ?? 0),
+        };
+      });
+      setProductsCache(next);
+      return next;
+
+  }
+  /**
+ * Combine cart into ONE parcel:
+ * - totalWeight = sum(weight_oz * qty)
+ * - length/width = max across items
+ * - height = max(height * qty)  (stacking the tallest item type)
+ * Adjust if you prefer multiple parcels.
+ */
+
+  async function buildParcelFromCart() {
+
+    const cache = await hydrateProductsForCart();
+
+    let totalWeight = 0;
+    let maxLength = 0;
+    let maxWidth = 0;
+    let maxHeight = 0;
+    for (const item of cart) {
+      const row = cache[item.product_id];
+      if (!row) throw new Error(`Missing product data for ID ${item.product_id}`);
+      totalWeight += row.weight_oz * item.quantity;
+      maxLength = Math.max(maxLength, row.length);
+      maxWidth = Math.max(maxWidth, row.width);
+      maxHeight = Math.max(maxHeight, row.height * item.quantity); // stack height
+    }
+     // Shippo requires positive ints/floats; guard + round sensibly
+     totalWeight = Math.max(1, Math.round(totalWeight));
+    maxLength = Math.max(1, Math.round(maxLength));
+    maxWidth = Math.max(1, Math.round(maxWidth));
+    maxHeight = Math.max(1, Math.round(maxHeight));
+
+    return {
+      length: maxLength,
+      width: maxWidth,
+      height: maxHeight,
+      distance_unit: "in",
+      weight: totalWeight,
+      mass_unit: "oz",
+    };
+  }
 
   async function handleCalculateShipping() {
     setCalcClicked(true);
@@ -99,6 +171,13 @@ export default function CheckoutPage() {
 
     setRateLoading(true);
     try {
+      //Build new parcel from cart
+      const parcel = await buildParcelFromCart();
+      if (!parcel || !parcel.length || !parcel.width || !parcel.height || !parcel.weight) {
+        throw new Error("Invalid parcel dimensions");
+      }
+      
+      // Call the Shippo function
       const res = await fetch("/.netlify/functions/shippo-shipping-rates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,7 +192,7 @@ export default function CheckoutPage() {
             zip: formData.zip,
             country: formData.country || "US",
           },
-          parcel, // swap with your computed parcel when ready
+          parcel, 
         }),
       });
 
